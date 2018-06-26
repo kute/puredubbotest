@@ -1,6 +1,7 @@
 package com.kute.domain;
 
 import com.google.common.base.Joiner;
+import org.apache.commons.lang3.RandomUtils;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -26,7 +27,7 @@ public class User implements Serializable {
     public User(Integer id) {
         this.id = id;
         this.name = Joiner.on("_").join("Random_name", id);
-        this.age = new Random().nextLong();
+        this.age = RandomUtils.nextLong(1, 100);
     }
 
     public Integer getId() {

@@ -10,4 +10,6 @@ public interface IConsumerService {
 
     User getUser(Integer userId);
 
+    String findCity(String code);
+
 }

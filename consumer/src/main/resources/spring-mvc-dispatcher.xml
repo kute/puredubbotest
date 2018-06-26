@@ -52,6 +52,60 @@
         </property>
     </bean>
 
+    <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <property name="useNotAcceptableStatusCode" value="true" />
+        <property name="order" value="1" />
+        <property name="contentNegotiationManager">
+            <bean class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+                <property name="favorPathExtension" value="true"/>
+                <property name="ignoreAcceptHeader" value="false"/>
+                <property name="defaultContentType" value="application/json;charset=UTF-8" />
+                <!--@see org.springframework.http.MediaType-->
+                <property name="mediaTypes">
+                    <map>
+                        <entry key="html" value="text/html;charset=UTF-8"/>
+                        <entry key="json" value="application/json;charset=UTF-8"/>
+                        <entry key="xml" value="application/xml;charset=UTF-8"/>
+                    </map>
+                </property>
+            </bean>
+        </property>
+        <property name="viewResolvers">
+            <list>
+                <bean class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+                    <property name="cache" value="false"/>
+                    <property name="prefix" value=""/>
+                    <property name="suffix" value=".ftl"/>
+                    <property name="exposeSpringMacroHelpers" value="true"/>
+                    <property name="exposeRequestAttributes" value="true"/>
+                    <property name="exposeSessionAttributes" value="true"/>
+                    <property name="contentType" value="text/html;charset=UTF-8"/>
+                </bean>
+            </list>
+        </property>
+        <property name="defaultViews">
+            <list>
+                <bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView">
+                    <property name="objectMapper" ref="objectMapper" />
+                    <property name="contentType" value="application/json;charset=UTF-8" />
+                    <property name="modelKeys">
+                        <set>
+                            <value>code</value>
+                            <value>message</value>
+                            <value>data</value>
+                        </set>
+                    </property>
+                </bean>
+                <bean id="marshallingView"
+                      class="org.springframework.web.servlet.view.xml.MarshallingView">
+                    <property name="marshaller" ref="xstreamMarshaller"></property>
+                    <property name="modelKey" value="result"></property>
+                    <property name="contentType" value="application/xml" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+
     <bean id="xstreamMarshaller" class="org.springframework.oxm.xstream.XStreamMarshaller">
         <property name="autodetectAnnotations" value="true" />
         <property name="streamDriver">

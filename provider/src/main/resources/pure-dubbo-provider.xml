@@ -9,10 +9,13 @@
 
     <dubbo:application name="pure-service-provider" />
 
+    <dubbo:annotation package="com.kute.service.impl" />
+
     <dubbo:registry protocol="${dubbo.registry.protocol}" address="${dubbo.registry.address}" />
 
     <dubbo:protocol name="dubbo" port="20881"/>
 
+    <!-- 通过配置暴露服务 -->
     <dubbo:service interface="com.kute.service.IUserService" ref="userService" />
 
 </beans>

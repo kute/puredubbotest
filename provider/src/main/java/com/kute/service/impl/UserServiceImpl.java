@@ -1,4 +1,4 @@
-package com.kute.service;
+package com.kute.service.impl;
 
 import com.kute.cache.LocalCacheUtil;
 import com.kute.domain.User;
