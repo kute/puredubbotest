@@ -11,10 +11,23 @@
 
     <dubbo:annotation package="com.kute.service.impl" />
 
-    <dubbo:registry protocol="${dubbo.registry.protocol}" address="${dubbo.registry.address}" />
+    <!--
+    集群容错模式：http://dubbo.apache.org/books/dubbo-user-book/demos/fault-tolerent-strategy.html
+    负载均衡：http://dubbo.apache.org/books/dubbo-user-book/demos/loadbalance.html
+    -->
+    <dubbo:consumer cluster="failover" loadbalance="consistencehash" />
 
-    <dubbo:reference interface="com.kute.service.IUserService" id="userService" check="true">
-        <dubbo:method name="getUser" timeout="${dubbo.method.timeout}" />
+    <!-- check=true 注册中心启动时检查(注册订阅失败时报错) -->
+    <dubbo:registry protocol="${dubbo.registry.protocol}" address="${dubbo.registry.address}" check="true" />
+
+    <!--
+    引用暴露的服务
+    1. check=true: 表示在启动时检查依赖的服务是否可用，不可用会不可用时会抛出异常，阻止 Spring 初始化完成，默认true
+    若 Spring 容器是懒加载的，则check设置为false
+    2. retries=2 : 失败时重试
+     -->
+    <dubbo:reference interface="com.kute.service.IUserService" id="userService" check="true" retries="2">
+        <dubbo:method name="getUser" timeout="${dubbo.method.timeout}" retries="1" />
     </dubbo:reference>
 
 </beans>

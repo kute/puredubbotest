@@ -22,6 +22,9 @@ public class ConsumerServiceImpl implements IConsumerService {
     @Resource
     private IUserService userService;
 
+    /**
+     * 通过注解 引入 服务
+     */
     @Reference(interfaceClass = ICityService.class)
     private ICityService cityService;
 
