@@ -1,6 +1,7 @@
 package com.kute.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.dubbo.rpc.cluster.loadbalance.ConsistentHashLoadBalance;
 import com.kute.service.ICityService;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 public class CityServiceImpl implements ICityService {
     @Override
     public String findCity(String code) {
+
         return code;
     }
 }

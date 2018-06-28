@@ -15,9 +15,14 @@
     集群容错模式：http://dubbo.apache.org/books/dubbo-user-book/demos/fault-tolerent-strategy.html
     负载均衡：http://dubbo.apache.org/books/dubbo-user-book/demos/loadbalance.html
     -->
-    <dubbo:provider cluster="failover" loadbalance="consistencehash" />
+    <dubbo:provider cluster="failover" loadbalance="consistenthash" />
 
-    <dubbo:registry protocol="${dubbo.registry.protocol}" address="${dubbo.registry.address}" />
+    <!--
+    register=false 禁用注册
+    subscribe=false 禁用订阅
+    -->
+    <dubbo:registry protocol="${dubbo.registry.protocol}" address="${dubbo.registry.address}"
+                    register="true" subscribe="true" />
 
     <dubbo:protocol name="dubbo" port="20881"/>
 

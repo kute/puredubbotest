@@ -1,6 +1,8 @@
 package com.kute.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.dubbo.rpc.cluster.LoadBalance;
+import com.alibaba.dubbo.rpc.cluster.loadbalance.ConsistentHashLoadBalance;
 import com.kute.domain.User;
 import com.kute.service.ICityService;
 import com.kute.service.IConsumerService;
