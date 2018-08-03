@@ -30,7 +30,7 @@ public class ConsumerServiceImpl implements IConsumerService {
     /**
      * 通过注解 引入 服务
      */
-    @Reference(interfaceClass = ICityService.class)
+//    @Reference(interfaceClass = ICityService.class)
     /**
      * 设置方法级别的重试次数
      */
@@ -44,12 +44,27 @@ public class ConsumerServiceImpl implements IConsumerService {
      * 设置 ICityService 接口 容错模式为 failover，默认重试次数为5，而单独设置 buildCity方法（非幂等）的 容错模式为快速失败
      */
 //    @Reference(interfaceClass = ICityService.class, cluster = "failover", retries = 5, parameters = {"buildCity.cluster", "failfast"})
+
+    /**
+     * 设置服务降级:
+     * @see com.alibaba.dubbo.rpc.cluster.support.wrapper.MockClusterInvoker
+     * mock属性值：
+     *    false: 不降级
+     *    true: 服务调用失败后，调用mock服务接口进行降级
+     *    default: 服务调用失败后，调用mock服务接口进行降级
+     *    forece: 强制 调用mock服务接口进行降级，无论 接口调用是否成功
+     * mock服务接口类定义规则：接口+Mock，如 ICityServiceMock，注意 此类的package路径要和接口一致，如果不一致则需要直接在mock参数里指明 此类
+     */
+//    @Reference(interfaceClass = ICityService.class, retries = 5, check = false, mock = "com.kute.service.mock.ICityServiceMock")
+    /**
+     *  对于 想单独为 某个方法设置 降级mock，可以在 parameters 中设置
+     *  如下 设置了 findCity 重试次数（不重试，针对 非幂等接口 就这么设置），然后如果失败了就 调用降级mock
+     */
+    @Reference(interfaceClass = ICityService.class, retries = 5, parameters = {"findCity.mock", "com.kute.service.mock.method.ICityServiceFindCityMock", "findCity.retries", "0"})
     private ICityService cityService;
 
     @Override
     public User getUser(Integer userId) {
-
-        RpcContext.getContext().setAttachment("akey", "avalue");
 
         logger.info("get user by rpc call:{}", userId);
         return userService.getUser(userId);
@@ -58,9 +73,9 @@ public class ConsumerServiceImpl implements IConsumerService {
     @Override
     public String findCity(String code, long timeOutMillis) {
         String result = "city-null";
-        try{
+        try {
             result = cityService.findCity(code, timeOutMillis);
-        } catch(Exception e){
+        } catch (Exception e) {
             logger.error("findCity exception", e);
         }
         return result;
@@ -69,15 +84,15 @@ public class ConsumerServiceImpl implements IConsumerService {
     @Override
     public String buildCity(String code) {
         String result = "null-value";
-        try{
+        try {
             cityService.buildCity(code);
         } catch (BuildCityException be) {
             logger.error("buildCity BuildCityException:{}", be.getMessage());
         } catch (BussinessException se) {
             logger.error("buildCity BussinessException:{}", se.getMessage());
-        } catch(Exception e){
+        } catch (Exception e) {
             logger.error("buildCity Exception:{}", e.getMessage());
-        } catch(Throwable t){
+        } catch (Throwable t) {
             logger.error("buildCity Throwable:{}", t.getMessage());
         }
         return result;

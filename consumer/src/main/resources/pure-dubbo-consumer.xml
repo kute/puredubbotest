@@ -25,8 +25,16 @@
     1. check=true: 表示在启动时检查依赖的服务是否可用，不可用会不可用时会抛出异常，阻止 Spring 初始化完成，默认true
     若 Spring 容器是懒加载的，则check设置为false
     2. retries=2 : 失败时重试
+    3. mock:
+     * 设置服务降级
+     * mock参数值：
+     *    false: 不降级
+     *    true: 服务调用失败后，调用mock服务接口进行降级
+     *    default: 服务调用失败后，调用mock服务接口进行降级
+     *    forece: 强制 调用mock服务接口进行降级，无论 接口调用是否成功
+     * mock服务接口类定义规则：接口+Mock，如 ICityServiceMock，注意 此类的package路径要和接口一致，如果不一致则需要直接在mock参数里指明 此类
      -->
-    <dubbo:reference interface="com.kute.service.IUserService" id="userService" check="true" retries="2" cache="lru">
+    <dubbo:reference interface="com.kute.service.IUserService" id="userService" check="false" retries="2" cache="lru" mock="com.kute.service.mock.IUserServiceMock">
         <dubbo:method name="getUser" timeout="${dubbo.method.timeout}" retries="1" onthrow="tolerantService.getUser" />
     </dubbo:reference>
 

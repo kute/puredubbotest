@@ -11,7 +11,8 @@ import org.springframework.stereotype.Service;
 public class TolerantServiceImpl implements ITolerantService {
     @Override
     public User getUser(Integer userId) {
-
-        return null;
+        User user = new User(userId);
+        user.setName("tolerant_getUser_name_" + userId);
+        return user;
     }
 }
