@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 
@@ -26,9 +27,17 @@ public class CityController {
      * @return
      */
     @RequestMapping(value = "/findcity/{code}", method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<String> getUser(
+    public ResponseEntity<String> findcity(
+            @PathVariable("code") String code,
+            @RequestParam(value = "timeOutMillis", required = false) long timeOutMillis) {
+        String city = consumerService.findCity(code, timeOutMillis);
+        return new ResponseEntity<>(city, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/buildcity/{code}", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<String> buildcity(
             @PathVariable("code") String code) {
-        String city = consumerService.findCity(code);
+        String city = consumerService.buildCity(code);
         return new ResponseEntity<>(city, HttpStatus.OK);
     }
 

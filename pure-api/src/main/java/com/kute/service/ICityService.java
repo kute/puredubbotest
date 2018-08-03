@@ -5,6 +5,7 @@ package com.kute.service;
  */
 public interface ICityService {
 
-    String findCity(String code);
+    String findCity(String code, long timeOutMillis);
 
+    String buildCity(String code);
 }

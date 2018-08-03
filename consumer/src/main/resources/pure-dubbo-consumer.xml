@@ -27,7 +27,7 @@
     2. retries=2 : 失败时重试
      -->
     <dubbo:reference interface="com.kute.service.IUserService" id="userService" check="true" retries="2" cache="lru">
-        <dubbo:method name="getUser" timeout="${dubbo.method.timeout}" retries="1" />
+        <dubbo:method name="getUser" timeout="${dubbo.method.timeout}" retries="1" onthrow="tolerantService.getUser" />
     </dubbo:reference>
 
 </beans>

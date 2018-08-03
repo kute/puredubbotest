@@ -10,6 +10,8 @@ public interface IConsumerService {
 
     User getUser(Integer userId);
 
-    String findCity(String code);
+    String findCity(String code, long timeOutMillis);
+
+    String buildCity(String code);
 
 }
