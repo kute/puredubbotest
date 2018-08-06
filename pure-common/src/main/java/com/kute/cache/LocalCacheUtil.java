@@ -3,20 +3,25 @@ package com.kute.cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.kute.domain.User;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * created by kute on 2018/05/16 22:39
  */
-public class LocalCacheUtil {
+public class LocalCacheUtil<K, V> {
 
+    private static final LocalCacheUtil<Object, Object> INSTANCE = new LocalCacheUtil<>();
 
-    private static final LoadingCache<Integer, User> CACHE = CacheBuilder.newBuilder()
+    private LocalCacheUtil() {
+    }
+
+    public static LocalCacheUtil<Object, Object> getINSTANCE() {
+        return INSTANCE;
+    }
+
+    private final LoadingCache<K, V> CACHE = CacheBuilder.newBuilder()
 //    设置并发级别为8，并发级别是指可以同时写缓存的线程数
             .concurrencyLevel(10)
             .maximumSize(500)
@@ -27,17 +32,16 @@ public class LocalCacheUtil {
             .recordStats()
             .build(
                     // 当缓存未命中时，通过此重新设置缓存，注意：此不能返回 null
-                    new CacheLoader<Integer, User>() {
+                    new CacheLoader<K, V>() {
                         @Override
-                        public User load(Integer userId) throws Exception {
-                            return new User(userId);
+                        public V load(K key) throws Exception {
+                            return null;
                         }
                     });
 
-    public static User get(Integer userId) throws ExecutionException {
-        return CACHE.get(userId);
+    public V get(K key) throws ExecutionException {
+        return CACHE.get(key);
     }
-
 
 
 }

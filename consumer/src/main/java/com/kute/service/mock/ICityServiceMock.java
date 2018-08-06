@@ -15,4 +15,9 @@ public class ICityServiceMock implements ICityService {
     public String buildCity(String code) {
         return "mock_buildCity_" + code;
     }
+
+    @Override
+    public String liveCity(String code, long timeOutMillis) {
+        return "mock_liveCity_" + code;
+    }
 }

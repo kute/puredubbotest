@@ -33,9 +33,12 @@
      *    default: 服务调用失败后，调用mock服务接口进行降级
      *    forece: 强制 调用mock服务接口进行降级，无论 接口调用是否成功
      * mock服务接口类定义规则：接口+Mock，如 ICityServiceMock，注意 此类的package路径要和接口一致，如果不一致则需要直接在mock参数里指明 此类
+    4. cache
+       结果缓存，用于加速热门数据的访问速度，Dubbo 提供声明式缓存，以减少用户加缓存的工作量
      -->
     <dubbo:reference interface="com.kute.service.IUserService" id="userService" check="false" retries="2" cache="lru" mock="com.kute.service.mock.IUserServiceMock">
-        <dubbo:method name="getUser" timeout="${dubbo.method.timeout}" retries="1" onthrow="tolerantService.getUser" />
+        <dubbo:method name="getUser" timeout="${dubbo.method.timeout}" retries="1"
+                      onthrow="tolerantService.getUser" loadbalance="roundrobin" />
     </dubbo:reference>
 
 </beans>

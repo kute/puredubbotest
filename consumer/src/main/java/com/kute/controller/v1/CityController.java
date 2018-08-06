@@ -1,5 +1,6 @@
 package com.kute.controller.v1;
 
+import com.alibaba.dubbo.rpc.RpcContext;
 import com.kute.service.IConsumerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +39,14 @@ public class CityController {
     public ResponseEntity<String> buildcity(
             @PathVariable("code") String code) {
         String city = consumerService.buildCity(code);
+        return new ResponseEntity<>(city, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/livecity/{code}", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<String> livecity(
+            @PathVariable("code") String code,
+            @RequestParam(value = "timeOutMillis", required = false) long timeOutMillis) {
+        String city = consumerService.liveCity(code, timeOutMillis);
         return new ResponseEntity<>(city, HttpStatus.OK);
     }
 

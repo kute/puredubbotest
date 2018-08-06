@@ -3,10 +3,9 @@ package com.kute.service;
 import com.kute.domain.User;
 
 /**
- * created by kute on 2018/08/01 20:11
+ * created by kute on 2018/08/03 19:07
  */
 public interface ITolerantService {
 
-    User getUser(Integer userId);
-
+    public User getUser(Integer id);
 }

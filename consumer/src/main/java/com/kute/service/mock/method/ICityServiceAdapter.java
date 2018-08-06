@@ -15,4 +15,9 @@ public class ICityServiceAdapter implements ICityService {
     public String buildCity(String code) {
         return null;
     }
+
+    @Override
+    public String liveCity(String code, long timeOutMillis) {
+        return null;
+    }
 }

@@ -1,10 +1,18 @@
 package com.kute.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.dubbo.rpc.RpcContext;
 import com.alibaba.dubbo.rpc.cluster.loadbalance.ConsistentHashLoadBalance;
+import com.google.common.base.Strings;
+import com.kute.annotation.DubboRetryCheck;
+import com.kute.cache.redis.ShardedRedisUtil;
 import com.kute.exception.BuildCityException;
 import com.kute.service.ICityService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * created by kute on 2018/06/26 21:54
@@ -18,6 +26,10 @@ import org.springframework.stereotype.Component;
         }
 )
 public class CityServiceImpl implements ICityService {
+
+    private static final Logger logger = LoggerFactory.getLogger(CityServiceImpl.class);
+
+    private static final AtomicInteger call = new AtomicInteger(0);
 
     @Override
     public String findCity(String code, long timeOutMillis) {
@@ -33,11 +45,28 @@ public class CityServiceImpl implements ICityService {
 
     @Override
     public String buildCity(String code) {
-        if("1".equalsIgnoreCase(code)) {
+        if ("1".equalsIgnoreCase(code)) {
             throw new BuildCityException("CityServiceImpl.buildCity.BuildCityException");
         } else if ("2".equalsIgnoreCase(code)) {
             throw new RuntimeException("CityServiceImpl.buildCity.RuntimeException");
         }
         return "buildCity_" + code;
+    }
+
+    @DubboRetryCheck
+    @Override
+    public String liveCity(String code, long timeOutMillis) {
+        int times = call.incrementAndGet();
+
+        try {
+            logger.info("liveCity-call-normal-logic, thread={}, value={}", new Object[]{
+                    Thread.currentThread().getId(), RpcContext.getContext().getAttachment("livecity_start_key")
+            });
+            Thread.sleep(timeOutMillis);
+        } catch (Exception e) {
+            // ignore
+        }
+        logger.info("liveCity-call-times-over:{}, thread={}", times, Thread.currentThread().getId());
+        return "liveCity_" + code;
     }
 }

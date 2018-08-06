@@ -97,4 +97,16 @@ public class ConsumerServiceImpl implements IConsumerService {
         }
         return result;
     }
+
+    @Override
+    public String liveCity(String code, long timeOutMillis) {
+        logger.info("consumer-livecity-begin:{}", code);
+
+        // 传递 隐士参数
+        RpcContext.getContext().setAttachment("livecity_start_key", "0");
+
+        String result = cityService.liveCity(code, timeOutMillis);
+        logger.info("consumer-livecity-over:{}", result);
+        return result;
+    }
 }

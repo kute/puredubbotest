@@ -14,4 +14,6 @@ public interface IConsumerService {
 
     String buildCity(String code);
 
+    String liveCity(String code, long timeOutMillis);
+
 }
