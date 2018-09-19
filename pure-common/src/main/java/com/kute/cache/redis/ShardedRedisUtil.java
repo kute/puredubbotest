@@ -16,6 +16,18 @@ import java.util.Map;
 
 public class ShardedRedisUtil {
 
+    public static void main(String[] args) {
+
+        try{
+            String result = ShardedRedisUtil.getInstance().set("kute", "1", "NX", "PX", 30000L);
+            System.out.println(result);
+        } catch(Exception e){
+        e.printStackTrace();
+        }
+
+
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(ShardedRedisUtil.class);
 
     private static final String DEFAULT_REDIS_SEPARATOR = ";";

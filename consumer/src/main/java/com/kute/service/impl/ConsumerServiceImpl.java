@@ -4,6 +4,8 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.rpc.RpcContext;
 import com.alibaba.dubbo.rpc.cluster.LoadBalance;
 import com.alibaba.dubbo.rpc.cluster.loadbalance.ConsistentHashLoadBalance;
+import com.google.common.base.Joiner;
+import com.kute.annotation.DubboConsumerBeforeInvoke;
 import com.kute.domain.User;
 import com.kute.exception.BuildCityException;
 import com.kute.exception.BussinessException;
@@ -15,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.UUID;
 
 /**
  * created by kute on 2018/05/14 01:36
@@ -60,7 +63,8 @@ public class ConsumerServiceImpl implements IConsumerService {
      *  对于 想单独为 某个方法设置 降级mock，可以在 parameters 中设置
      *  如下 设置了 findCity 重试次数（不重试，针对 非幂等接口 就这么设置），然后如果失败了就 调用降级mock
      */
-    @Reference(interfaceClass = ICityService.class, retries = 5, parameters = {"findCity.mock", "com.kute.service.mock.method.ICityServiceFindCityMock", "findCity.retries", "0"})
+//    @Reference(interfaceClass = ICityService.class, retries = 5, parameters = {"findCity.mock", "com.kute.service.mock.method.ICityServiceFindCityMock", "findCity.retries", "0"})
+    @Reference(interfaceClass = ICityService.class, retries = 5)
     private ICityService cityService;
 
     @Override
@@ -98,15 +102,59 @@ public class ConsumerServiceImpl implements IConsumerService {
         return result;
     }
 
+    @DubboConsumerBeforeInvoke(serviceClazz = {ICityService.class}, method = {"liveCity"})
     @Override
     public String liveCity(String code, long timeOutMillis) {
         logger.info("consumer-livecity-begin:{}", code);
 
         // 传递 隐士参数
-        RpcContext.getContext().setAttachment("livecity_start_key", "0");
+//        RpcContext.getContext().setAttachment("livecity_start_key", "0");
+
+        String methodKey = getMethodKey(ICityService.class, "liveCity");
+
+        String uuid = UUID.randomUUID().toString();
+        logger.info("Dubbo method[{}] setAttachment in context:{}", methodKey, uuid);
+        RpcContext.getContext().setAttachment(methodKey, uuid);
+
+        logger.info("url={}", RpcContext.getContext().getUrl());
 
         String result = cityService.liveCity(code, timeOutMillis);
         logger.info("consumer-livecity-over:{}", result);
+
+//        call(code, timeOutMillis);
+
+        try {
+            Thread.sleep(7000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        String methodKey2 = getMethodKey(ICityService.class, "findCity");
+
+        String uuid2 = UUID.randomUUID().toString();
+        logger.info("Dubbo method[{}] setAttachment in context:{}", methodKey2, uuid2);
+        RpcContext.getContext().setAttachment(methodKey2, uuid2);
+
+        String result2 = cityService.findCity(code, timeOutMillis);
+        logger.info("consumer-findcity-over:{}", result2);
+
         return result;
+    }
+
+    private void call(String code, long timeOutMillis) {
+        String methodKey2 = getMethodKey(ICityService.class, "findCity");
+
+        String uuid2 = UUID.randomUUID().toString();
+        logger.info("Dubbo method[{}] setAttachment in context:{}", methodKey2, uuid2);
+        RpcContext.getContext().setAttachment(methodKey2, uuid2);
+
+        String result2 = cityService.findCity(code, timeOutMillis);
+        logger.info("consumer-findcity-over:{}", result2);
+
+    }
+
+
+    private String getMethodKey(Class<?> serviceClass, String methodName) {
+        return Joiner.on(".").useForNull("").join(serviceClass.getName(), methodName, "dubbo.retry");
     }
 }

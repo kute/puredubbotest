@@ -6,7 +6,12 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
 @Inherited
-public @interface DubboRetryCheck {
+public @interface DubboProviderRetryCheck {
 
-    int timeOutMillis() default 3000;
+    /**
+     * redis 过期时间
+     * @return
+     */
+    long expiredMillis() default 3000;
+
 }

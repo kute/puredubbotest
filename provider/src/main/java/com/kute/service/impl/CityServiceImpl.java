@@ -2,9 +2,8 @@ package com.kute.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.dubbo.rpc.RpcContext;
-import com.alibaba.dubbo.rpc.cluster.loadbalance.ConsistentHashLoadBalance;
-import com.google.common.base.Strings;
-import com.kute.annotation.DubboRetryCheck;
+import com.google.common.base.Joiner;
+import com.kute.annotation.DubboProviderRetryCheck;
 import com.kute.cache.redis.ShardedRedisUtil;
 import com.kute.exception.BuildCityException;
 import com.kute.service.ICityService;
@@ -33,14 +32,32 @@ public class CityServiceImpl implements ICityService {
 
     @Override
     public String findCity(String code, long timeOutMillis) {
-        if (timeOutMillis > 0) {
-            try {
-                Thread.sleep(timeOutMillis);
-            } catch (InterruptedException e) {
-                // ignore
-            }
+        String methodKey = getMethodKey(ICityService.class, "findCity");
+
+        String value = RpcContext.getContext().getAttachment(methodKey);
+
+        logger.info("Dubbo method[{}] parameters:{}, thread={}, urlparameter={}", new Object[]{
+                methodKey, value, Thread.currentThread().getId(), RpcContext.getContext().getUrl().getParameter(methodKey)
+        });
+
+        if (!"OK".equalsIgnoreCase(ShardedRedisUtil.getInstance().set(methodKey, value, "NX", "PX", timeOutMillis))) {
+            logger.info("Dubbo method[{}] repeat call then return, thread={}", methodKey, Thread.currentThread().getId());
+            // 若 设置不成功，表示key已存在，即重复调用，所以直接返回
+            return "findCity_repeat_" + code;
         }
-        return code;
+
+        try {
+            logger.info("findCity-call-normal-logic, thread={}", new Object[]{
+                    Thread.currentThread().getId()
+            });
+            Thread.sleep(timeOutMillis);
+        } catch (Exception e) {
+            // ignore
+        } finally {
+            ShardedRedisUtil.getInstance().del(methodKey);
+        }
+        logger.info("findCity-call-times-over:thread={}", Thread.currentThread().getId());
+        return "findCity_" + code;
     }
 
     @Override
@@ -53,20 +70,41 @@ public class CityServiceImpl implements ICityService {
         return "buildCity_" + code;
     }
 
-    @DubboRetryCheck
+    @DubboProviderRetryCheck()
     @Override
     public String liveCity(String code, long timeOutMillis) {
         int times = call.incrementAndGet();
 
+
+        String methodKey = getMethodKey(ICityService.class, "liveCity");
+
+        String value = RpcContext.getContext().getAttachment(methodKey);
+
+        logger.info("Dubbo method[{}] parameters:{}, thread={}, urlparameter={}", new Object[]{
+                methodKey, value, Thread.currentThread().getId(), RpcContext.getContext().getUrl().getParameter(methodKey)
+        });
+
+        if (!"OK".equalsIgnoreCase(ShardedRedisUtil.getInstance().set(methodKey, value, "NX", "PX", timeOutMillis))) {
+            logger.info("Dubbo method[{}] repeat call then return, thread={}", methodKey, Thread.currentThread().getId());
+            // 若 设置不成功，表示key已存在，即重复调用，所以直接返回
+            return "liveCity_repeat_" + code;
+        }
+
         try {
-            logger.info("liveCity-call-normal-logic, thread={}, value={}", new Object[]{
-                    Thread.currentThread().getId(), RpcContext.getContext().getAttachment("livecity_start_key")
+            logger.info("liveCity-call-normal-logic, thread={}", new Object[]{
+                    Thread.currentThread().getId()
             });
             Thread.sleep(timeOutMillis);
         } catch (Exception e) {
             // ignore
+        } finally {
+            ShardedRedisUtil.getInstance().del(methodKey);
         }
         logger.info("liveCity-call-times-over:{}, thread={}", times, Thread.currentThread().getId());
         return "liveCity_" + code;
+    }
+
+    private String getMethodKey(Class<?> serviceClass, String methodName) {
+        return Joiner.on(".").useForNull("").join(serviceClass.getName(), methodName, "dubbo.retry");
     }
 }
