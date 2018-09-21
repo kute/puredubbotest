@@ -7,7 +7,7 @@
                            http://code.alibabatech.com/schema/dubbo
                            http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 
-    <dubbo:application name="pure-service-provider" />
+    <dubbo:application name="${dubbo.application.name}" />
 
     <dubbo:annotation package="com.kute.service.impl" />
 
