@@ -1,4 +1,4 @@
-package com.kute.controller;
+package com.kute.controller.v1;
 
 import com.kute.service.MiddlewareService;
 import com.kute.util.StringUtil;

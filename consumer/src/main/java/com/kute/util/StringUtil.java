@@ -1,6 +1,5 @@
 package com.kute.util;
 
-import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;

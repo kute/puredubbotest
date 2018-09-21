@@ -15,7 +15,6 @@
         <module>consumer</module>
         <module>pure-admin</module>
         <module>registry-middleware</module>
-        <module>gateway-consumer</module>
     </modules>
     <packaging>pom</packaging>
 

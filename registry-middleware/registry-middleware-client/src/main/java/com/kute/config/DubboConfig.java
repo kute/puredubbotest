@@ -51,7 +51,7 @@ public class DubboConfig {
     @Value("${dubbo.registry.file}")
     private String file;
 
-    @Bean("dubboApplicationConfig")
+    @Bean(name = "dubboApplicationConfig")
     public ApplicationConfig applicationConfig() {
         ApplicationConfig applicationConfig = new ApplicationConfig(name);
         applicationConfig.setVersion(version);
@@ -62,7 +62,7 @@ public class DubboConfig {
         return applicationConfig;
     }
 
-    @Bean("dubboRegistryConfig")
+    @Bean(name = "dubboRegistryConfig")
     public RegistryConfig registryConfig() {
         RegistryConfig registryConfig = new RegistryConfig(address);
         registryConfig.setProtocol(protocol);

@@ -21,7 +21,8 @@ import java.util.Map;
  * created by kute on 2018/09/20 17:06
  */
 @Component
-@Service(interfaceClass = IDispatchService.class, group = "${dubbo.module}")
+@Service(interfaceClass = IDispatchService.class, group = "provider")
+//@Service(interfaceClass = IDispatchService.class, group = "${dubbo.module}")
 public class DispatchService implements IDispatchService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DispatchService.class);
